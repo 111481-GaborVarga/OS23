@@ -1,0 +1,19 @@
+1. ktorá funkcia zavolala funkciu syscall?
+    - usertrap () v kernel/trap.c:67
+
+2. Aká je hodnota p->trapframe->a7 a čo reprezentuje?
+    - trapframe = 0x87f74000 a je jeden system call number pre exec syscall
+
+3. Aký je predchádzajúci mód, v ktorom sa nachádzal procesor? Podľa čoho ste to zistili?
+    - predchádzajúci mód je ulozené v premennej mstatus. Hodnota je 0xa000000a2.
+      to znamená, že predchádzajúci mód bol user mode (zistil som podla manuálu čo je uvedené na 2. cv)
+
+4. Zapíšte inštrukciu jazyka assembly na ktorej jadro vyvolalo panic. V ktorom registri je uložená hodnota num?
+    - lw	a3,0(zero)  <-- instrukcia. num je ulozene v premennej a3
+
+5. Prečo jadro spadlo? Je v priestore jadra namapovaná adresa 0? Potvrdzuje to obsah registra scause vyššie?
+   Lebo adresa 0 nie je namapovaná nikde, hlavne v priestore jadra. hodnota scause-u je 13(dec),
+   čo znamená Load Page Fault podľa uvedenej knižky
+
+6. Aký je názov binárky, ktorá bežala, keď nastal panic? Aký je pid procesu?
+   Názov binárky je initcode.S a pid je 1
