@@ -91,3 +91,25 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+uint64
+sys_trace(void)
+{
+    argint(0, &myproc()->tracemask);
+	if (myproc()->tracemask < 0) {
+        return -1;
+    }
+	return 0;
+}
+
+uint64
+sys_sysinfo(void)
+{
+    uint64 info;
+
+    argaddr(0, &info);
+
+    if(info < 0)
+        return -1;
+    return systeminfo(info);
+}
