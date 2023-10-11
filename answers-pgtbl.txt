@@ -1,3 +1,6 @@
 1. Ktoré iné systémové volania môžu byť urýchlené prostredníctvom tejto zdieľanej stránky?
 
     - read a pipe.
+
+2. Vysvetlite logický význam každej dátovej stránky, ktorú vypísala funkcia vmprint().
+   Ku každej takej stránke tiež uveďte jej prístupové bity.
