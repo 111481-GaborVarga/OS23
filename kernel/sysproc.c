@@ -74,7 +74,42 @@ sys_sleep(void)
 int
 sys_pgaccess(void)
 {
-  // lab pgtbl: your code here.
+  uint64 fva;
+  int pnum;
+  uint64 abits;
+  int res = 0;
+  pte_t* pte_addr;
+  pte_t pte;
+
+  // read the arguments from the stack
+  argaddr(0, &fva);
+  if(fva < 0) {
+      return -1;
+  }
+
+  argint(1, &pnum);
+  if(pnum < 0) {
+      return -1;
+  }
+
+  argaddr(2, &abits);
+  if(abits < 0) {
+      return -1;
+  }
+
+  pagetable_t pagetable = myproc()->pagetable;
+  for(int i = 0; i < pnum; ++i) {
+      pte_addr = walk(pagetable, fva, 0);
+      pte = *pte_addr;
+      if(pte & PTE_A) {
+          (*pte_addr) = pte & ~(PTE_A);
+          res |= (1 << i);
+      }
+      fva += PGSIZE;
+  }
+  if(copyout(pagetable, abits, (char *)&res, sizeof(res))<0) {
+      return -1;
+  }
   return 0;
 }
 #endif
