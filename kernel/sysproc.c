@@ -77,32 +77,28 @@ sys_pgaccess(void)
   uint64 fva;
   int pnum;
   uint64 abits;
-  int res = 0;
   pte_t* pte_addr;
-  pte_t pte;
+  int res = 0;
 
   // read the arguments from the stack
   argaddr(0, &fva);
-  if(fva < 0) {
-      return -1;
-  }
-
   argint(1, &pnum);
-  if(pnum < 0) {
-      return -1;
-  }
-
   argaddr(2, &abits);
-  if(abits < 0) {
+
+  if(fva < 0 || pnum < 0 || abits < 0) {
       return -1;
   }
 
   pagetable_t pagetable = myproc()->pagetable;
   for(int i = 0; i < pnum; ++i) {
       pte_addr = walk(pagetable, fva, 0);
-      pte = *pte_addr;
-      if(pte & PTE_A) {
-          (*pte_addr) = pte & ~(PTE_A);
+
+      //if accessed
+      if(*pte_addr & PTE_A) {
+
+          //clear PTE_A flag
+          *pte_addr = *pte_addr & ~(PTE_A);
+
           res |= (1 << i);
       }
       fva += PGSIZE;
