@@ -456,18 +456,18 @@ pteprint(pagetable_t pagetable, int level)
   for(int i = 0; i < 512; i++) {
     pte_t pte = pagetable[i];
 
-
     // Print row if adress is valid
     if (pte & PTE_V) {
       for (int j = 0; j <= level; j++) {
         printf(".. ");
       }
-      printf("%d: pte %p pa %p\n", i, pte, PTE2PA(pte));
+      uint64 pa = PTE2PA(pte);
+      printf("%d: pte %p pa %p\n", i, pte, pa);
 
       // If it has a child, go deeper
       if((pte & (PTE_R|PTE_W)) == 0) {
-          uint64 child = PTE2PA(pte);
-          pteprint((pagetable_t)child, level+1);
+          pagetable_t child = (pagetable_t)pa;
+          pteprint(child, level+1);
       }
     }
   }
