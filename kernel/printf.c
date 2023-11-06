@@ -147,5 +147,4 @@ void backtrace(void) {
         printf("%p\n", *(uint64*)(fp-8));
         fp = *(uint64*)(fp-16);
     }
-
 }
