@@ -154,9 +154,6 @@ mappages(pagetable_t pagetable, uint64 va, uint64 size, uint64 pa, int perm)
 
   if(size == 0)
     panic("mappages: size");
-
-  if ((va & 0xfff) != (pa & 0xfff))
-    panic("mappages: 'va' and 'pa' mismatch");
   
   a = va;
   last = va + size - PGSIZE;
