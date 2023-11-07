@@ -450,24 +450,28 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
   }
 }
 
-void
-pteprint(pagetable_t pagetable, int level)
-{
-  for(int i = 0; i < 512; i++) {
-    pte_t pte = pagetable[i];
 
-    // Print row if adress is valid
-    if (pte & PTE_V) {
-      for (int j = 0; j <= level; j++) {
-        printf(".. ");
+void
+pteprint(pagetable_t pagetable, int level){
+  pte_t pte;
+  pte_t pa;
+
+  for (int i = 0; i < 512; i++) {
+    pte = pagetable[i];
+
+    //Print only if valid
+    if(pte & PTE_V) {
+      for(int j = 0; j <= level; j++) {
+        printf(" ..");
       }
-      uint64 pa = PTE2PA(pte);
+
+      pa = PTE2PA(pte);
       printf("%d: pte %p pa %p\n", i, pte, pa);
 
-      // If it has a child, go deeper
-      if((pte & (PTE_R|PTE_W)) == 0) {
-          pagetable_t child = (pagetable_t)pa;
-          pteprint(child, level+1);
+      //If it has a child, go one level deeper
+      if((pte & (PTE_W | PTE_R)) == 0) {
+        pagetable_t child = (pagetable_t) pa;
+        pteprint(child, level+1);
       }
     }
   }
