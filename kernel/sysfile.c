@@ -15,6 +15,7 @@
 #include "sleeplock.h"
 #include "file.h"
 #include "fcntl.h"
+#include "memlayout.h"
 
 // Fetch the nth word-sized system call argument as a file descriptor
 // and return both the descriptor and the corresponding struct file.
@@ -503,3 +504,66 @@ sys_pipe(void)
   }
   return 0;
 }
+
+/*uint64
+sys_mmap(void)
+{
+    uint64 addr, sz, offset;
+    int prot, flags, fd; struct file *f;
+
+
+    argaddr(0, &addr);
+    argaddr(1, &sz);
+    argint(2, &prot);
+    argint(3, &flags);
+    argfd(4, &fd, &f);
+    argaddr(5, &offset);
+
+    if(addr < 0 || sz < 0 || prot < 0 || flags < 0 || fd < 0 || offset < 0 || sz == 0)
+        return -1;
+
+    if((!f->readable && (prot & (PROT_READ)))
+       || (!f->writable && (prot & PROT_WRITE) && !(flags & MAP_PRIVATE)))
+        return -1;
+
+    sz = PGROUNDUP(sz);
+
+    struct proc *p = myproc();
+    struct vma *v = 0;
+    uint64 vaend = MMAPEND; // non-inclusive
+
+    // mmaptest never passed a non-zero addr argument.
+    // so addr here is ignored and a new unmapped va region is found to
+    // map the file
+    // our implementation maps file right below where the trapframe is,
+    // from high addresses to low addresses.
+
+    // Find a free vma, and calculate where to map the file along the way.
+    for(int i=0;i<NVMA;i++) {
+        struct vma *vv = &p->vmas[i];
+        if(vv->valid == 0) {
+            if(v == 0) {
+                v = &p->vmas[i];
+                // found free vma;
+                v->valid = 1;
+            }
+        } else if(vv->addr < vaend) {
+            vaend = PGROUNDDOWN(vv->addr);
+        }
+    }
+
+    if(v == 0){
+        panic("mmap: no free vma");
+    }
+
+    v->addr = vaend - sz;
+    v->length = sz;
+    v->prot = prot;
+    v->flags = flags;
+    v->file = f; // assume f->type == FD_INODE
+    v->offset = offset;
+
+    filedup(v->file);
+
+    return v->addr;
+}*/
